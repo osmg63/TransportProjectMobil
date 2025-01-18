@@ -12,7 +12,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import axios from 'axios';
-import { BASE } from '@env';
+import { Base1 } from '@env';
 import { Picker } from '@react-native-picker/picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Navbar from '../../navigation/Navbar';
@@ -67,11 +67,18 @@ const AddJob = ( ) => {
 
   useEffect(() => {
     const fetchCities = async () => {
+      const token = await AsyncStorage.getItem('jwtToken');
+
       try {
         const userInfoString = await AsyncStorage.getItem('userInfo');
         const userInfo = JSON.parse(userInfoString);
         setUser(userInfo);
-        const response = await axios.get(`${BASE}/Address/GetAllCity`);
+        const response = await axios.get(`${Base1}/Address/GetAllCity`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
         setCities(response.data || []);
       } catch (error) {
         console.error('Error fetching cities:', error);
@@ -81,8 +88,15 @@ const AddJob = ( ) => {
   }, []);
 
   const fetchDistricts = async (cityId, type) => {
+    const token = await AsyncStorage.getItem('jwtToken');
+
     try {
-      const response = await axios.get(`${BASE}/Address/GetAllDistrictByCityId/${cityId}`);
+      const response = await axios.get(`${Base1}/Address/GetAllDistrictByCityId/${cityId}`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
       if (type === 'departure') {
         setDeparture((prev) => ({
           ...prev,
@@ -108,10 +122,17 @@ const AddJob = ( ) => {
   };
 
   const fetchNeighborhoods = async (districtId, type) => {
+    const token = await AsyncStorage.getItem('jwtToken');
+
     try {
       const response = await axios.get(
-        `${BASE}/Address/GetAllNeighborhoodByDistrictId/${districtId}`
-      );
+        `${Base1}/Address/GetAllNeighborhoodByDistrictId/${districtId}`
+        , {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
       if (type === 'departure') {
         setDeparture((prev) => ({
           ...prev,
@@ -134,6 +155,8 @@ const AddJob = ( ) => {
 
   const handleAddJob = async () => {
     const userInfoString = await AsyncStorage.getItem('userInfo');
+    const token = await AsyncStorage.getItem('jwtToken');
+
     const userInfo = JSON.parse(userInfoString);
     const payload = {
       createJob: {
@@ -157,9 +180,11 @@ const AddJob = ( ) => {
     };
 
     try {
-      const response = await axios.post(`${BASE}/Job/AddJob`, payload, {
+      const response = await axios.post(`${Base1}/Job/AddJob`, payload, {
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+
         },
       });
       if (response.status === 200) {

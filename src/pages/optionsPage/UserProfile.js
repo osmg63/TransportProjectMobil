@@ -3,7 +3,7 @@ import { View, StyleSheet, ScrollView, Button } from 'react-native';
 import { Card, Text, Avatar, ActivityIndicator, Appbar } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-import { BASE } from '@env';
+import { Base1 } from '@env';
 import { useNavigation } from '@react-navigation/native'; // Navigation için
 import Navbar from "../../navigation/Navbar";
 
@@ -14,10 +14,19 @@ const UserProfile = () => {
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
+        const token = await AsyncStorage.getItem('jwtToken');
         const userInfoString = await AsyncStorage.getItem('userInfo');
         const userInfo = JSON.parse(userInfoString);
         if (userInfo) {
-          const response = await axios.get(`${BASE}/User/GetById/${userInfo.id}`);
+          const response = await axios.get(`${Base1}/User/GetById/${userInfo.id}`,
+            {
+              headers: {
+                Accept: '*/*',
+                Authorization: `Bearer ${token}`,
+    
+              },
+            }
+          );
           setUserInfo(response.data);
         }
       } catch (error) {
@@ -35,7 +44,7 @@ const UserProfile = () => {
       <>
       <Appbar.Header style={styles.appbar}>
         <Appbar.BackAction onPress={() => navigation.goBack()} /> {/* Geri butonu */}
-        <Appbar.Content title={<Text>Profilim</Text>} /> {/* Profilim yazısı */}
+        <Appbar.Content title="Profilim" /> {/* Profilim yazısı */}
       </Appbar.Header>
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#6200ee" />

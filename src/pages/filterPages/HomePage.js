@@ -14,7 +14,8 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import resim from "../../../assets/Foto12.jpg";
 import Navbar from "../../navigation/Navbar";
 import { useNavigation } from "@react-navigation/native";
-import { BASE } from '@env'; 
+import { Base1 } from '@env'; 
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const HomePage = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -71,6 +72,7 @@ const HomePage = () => {
   
 
   const fetchData = async () => {
+    const token = await AsyncStorage.getItem('jwtToken');
     setIsLoading(true);
     setError(null);
   
@@ -81,10 +83,11 @@ const HomePage = () => {
       filter: filters,
     };
     try {
-      const response = await fetch(`${BASE}/Job/Pagination`, {
+      const response = await fetch(`${Base1}/Job/Pagination`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(requestPayload),
       });

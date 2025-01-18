@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, FlatList, Text,Linking, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { Card, Appbar, Button } from 'react-native-paper';
-import { BASE } from '@env'; 
+import { Base1 } from '@env'; 
 import { useNavigation } from '@react-navigation/native';  // for navigation
 import axios from 'axios';
 import Navbar from "../../navigation/Navbar"; // Navbar import
@@ -20,14 +20,19 @@ const UserJob = () => {
 
   useEffect(() => {
     const fetchJobs = async () => {
+      
       setLoading(true); // Yükleniyor durumunu başlat
       try {
+        const token = await AsyncStorage.getItem('jwtToken');
+
         const userInfoString = await AsyncStorage.getItem('userInfo');
         const userInfo = JSON.parse(userInfoString);
-        const response = await fetch(`${BASE}/Job/GetJobByUserId/${userInfo.id}`, {
+        const response = await fetch(`${Base1}/Job/GetJobByUserId/${userInfo.id}`, {
           method: 'GET',
           headers: {
             Accept: '*/*',
+            Authorization: `Bearer ${token}`,
+
           },
         });
         if (!response.ok) {
@@ -47,15 +52,19 @@ const UserJob = () => {
   
   const handleAcceptOffer = async (offerId, recipientUserId) => {
     try {
+      const token = await AsyncStorage.getItem('jwtToken');
+
       const userInfoString = await AsyncStorage.getItem('userInfo');
       const userInfo = JSON.parse(userInfoString);
       // Teklif Kabul API Çağrısı
       const response = await axios.post(
-        `${BASE}/Offer/OfferAcceptByOfferId/${offerId}`,
+        `${Base1}/Offer/OfferAcceptByOfferId/${offerId}`,
         null, // Body gönderilmiyorsa `null` kullanılır
         {
           headers: {
             Accept: '*/*',
+            Authorization: `Bearer ${token}`,
+
           },
         }
       );
@@ -73,13 +82,17 @@ const UserJob = () => {
   
         // Mesaj Gönder API Çağrısı
         try {
+          const token = await AsyncStorage.getItem('jwtToken');
+
           const messageResponse = await axios.post(
-            `${BASE}/Message/AddMessage`,
+            `${Base1}/Message/AddMessage`,
             messageData,
             {
               headers: {
                 Accept: '*/*',
                 'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+
               },
             }
           );
@@ -102,7 +115,17 @@ const UserJob = () => {
   // API request to get offers by jobId
   const fetchOffersByJobId = async (jobId) => {
     try {
-      const response = await fetch(`${BASE}/Offer/GetOfferByJobIdUser/${jobId}`);
+      const token = await AsyncStorage.getItem('jwtToken');
+
+      const response = await fetch(`${Base1}/Offer/GetOfferByJobIdUser/${jobId}`,
+        {
+          headers: {
+            Accept: '*/*',
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+
+          },
+        });
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
@@ -125,11 +148,14 @@ const UserJob = () => {
 
   const handleDeleteJob = async (jobId) => {
       try {
+        const token = await AsyncStorage.getItem('jwtToken');
         const response = await axios.post(
-          `${BASE}/Job/ChangeJobInActiveById/${jobId}`,
+          `${Base1}/Job/ChangeJobInActiveById/${jobId}`,
           {
             headers: {
               Accept: '*/*',
+              Authorization: `Bearer ${token}`,
+
             },
           }
         );

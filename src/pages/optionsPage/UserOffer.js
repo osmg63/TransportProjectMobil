@@ -3,7 +3,7 @@ import { View, FlatList, Text, StyleSheet, TouchableOpacity } from 'react-native
 import { Card, Appbar, Button } from 'react-native-paper';
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
-import { BASE } from '@env'; 
+import { Base1 } from '@env'; 
 import Navbar from "../../navigation/Navbar";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -15,12 +15,31 @@ const UserOffer = () => {
   useEffect(() => {
     const fetchOffers = async () => {
       try {
+
+        const token = await AsyncStorage.getItem('jwtToken');
         const userInfoString = await AsyncStorage.getItem('userInfo');
         const userInfo = JSON.parse(userInfoString);
-        const response = await axios.get(`${BASE}/Offer/GetOfferByUserId/${userInfo.id}`);
+        const response = await axios.get(`${Base1}/Offer/GetOfferByUserId/${userInfo.id}`,
+          {
+            headers: {
+              Accept: '*/*',
+              Authorization: `Bearer ${token}`,
+
+            },
+          }
+        );
         const offersWithJobDetails = await Promise.all(
+          
           response.data.map(async (offer) => {
-            const jobResponse = await axios.get(`${BASE}/Job/GetById/${offer.jobId}`);
+            const jobResponse = await axios.get(`${Base1}/Job/GetById/${offer.jobId}`,
+              {
+                headers: {
+                  Accept: '*/*',
+                  Authorization: `Bearer ${token}`,
+    
+                },
+              }
+            );
             return {
               ...offer,
               job: jobResponse.data,
@@ -42,7 +61,16 @@ const UserOffer = () => {
 
   const handleDeleteOffer = async (offerId) => {
     try {
-      const response = await axios.delete(`${BASE}/Offer/OfferDeleteById/${offerId}`);
+      const token = await AsyncStorage.getItem('jwtToken');
+      const response = await axios.delete(`${Base1}/Offer/OfferDeleteById/${offerId}`,
+        {
+          headers: {
+            Accept: '*/*',
+            Authorization: `Bearer ${token}`,
+
+          },
+        }
+      );
       setOffers((prevOffers) => prevOffers.filter(item => item.id !== offerId));
     } catch (error) {
       console.error('Error silerken:', error);

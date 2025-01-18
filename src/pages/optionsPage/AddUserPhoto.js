@@ -3,9 +3,10 @@ import { View, Button, Alert, StyleSheet, TouchableOpacity, Text, Image } from '
 import * as DocumentPicker from 'expo-document-picker'; // expo-document-picker kullanımı
 import axios from 'axios';
 import { MaterialCommunityIcons } from '@expo/vector-icons'; // Çarpı ikonu için
-import { BASE } from '@env';
+import { BASE_URL } from '@env';
 import Navbar from '../../navigation/Navbar';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AddUserPhoto = (userId) => {
   const [singleFile, setSingleFile] = useState(null);
@@ -40,6 +41,8 @@ const AddUserPhoto = (userId) => {
 
     try {
       // FormData oluştur
+      const token = await AsyncStorage.getItem('jwtToken');
+
       const formData = new FormData();
       formData.append('id', id.toString()); // 'id' parametresi
 
@@ -52,11 +55,13 @@ const AddUserPhoto = (userId) => {
 
       // API'ye POST isteği gönder
       const response = await axios.post(
-        `${BASE}/User/AddPhotoUserById`, // API adresini güncelleyin
+        `${BASE_URL}/User/AddPhotoUserById`, // API adresini güncelleyin
         formData,
         {
           headers: {
             'Content-Type': 'multipart/form-data', // Dosya gönderimi için gerekli header
+            Authorization: `Bearer ${token}`,
+
           },
         }
       );

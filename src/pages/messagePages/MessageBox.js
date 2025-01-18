@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, ScrollView,Text,TouchableOpacity,FlatList, StyleSheet } from 'react-native';
 import { Avatar, List, Divider, ActivityIndicator } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { BASE } from '@env';
+import { Base1 } from '@env';
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { useNavigation } from '@react-navigation/native';  // useNavigation hook'u
 import Navbar from '../../navigation/Navbar';
@@ -16,12 +16,15 @@ const MessageBox = () => {
     // API'den veri çek
     const fetchMessages = async () => {
       try {
+        const token = await AsyncStorage.getItem('jwtToken');
         const userInfoString = await AsyncStorage.getItem('userInfo');
         const userInfo = JSON.parse(userInfoString);
-        const response = await fetch(`${BASE}/Message/Messagebox/${userInfo.id}`, {
+        const response = await fetch(`${Base1}/Message/Messagebox/${userInfo.id}`, {
           method: 'GET',
           headers: {
             'accept': '*/*',
+            Authorization: `Bearer ${token}`,
+
           },
         });
         const data = await response.json();

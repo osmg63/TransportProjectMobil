@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView,Image, TouchableOpacity, Linking } from 'react-native';
 import { Card } from "react-native-paper";
 import axios from 'axios'; // Axios için import
-import { BASE } from '@env';
+import { Base1 } from '@env';
 import Icon from "react-native-vector-icons/MaterialIcons"; // İkon için import
 import Navbar from "../../navigation/Navbar"; // Navbar import
 import { useNavigation } from "@react-navigation/native";
@@ -17,16 +17,27 @@ const DetailPage = ({ route }) => {
   useEffect(() => {
     // Kullanıcı ve araç bilgilerini API üzerinden almak
     const fetchUserData = async () => {
-      
+      const token = await AsyncStorage.getItem('jwtToken');
+
       try {
-        const userResponse = await axios.get(`${BASE}/User/GetById/${item.userId}`);
+        const userResponse = await axios.get(`${Base1}/User/GetById/${item.userId}`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
         setUser(userResponse.data);
 
       } catch (error) {
         console.error('Kullanıcı verisi alınamadı:', error);
       }
       try {
-        const vehicleResponse = await axios.get(`${BASE}/Vehicle/GetByUserIdVehicles/${item.userId}`);
+        const vehicleResponse = await axios.get(`${Base1}/Vehicle/GetByUserIdVehicles/${item.userId}`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
         setVehicle(vehicleResponse.data);
       } catch (error) {
         console.error('Araç verisi alınamadı:', error);
@@ -35,10 +46,12 @@ const DetailPage = ({ route }) => {
         const userInfoString = await AsyncStorage.getItem('userInfo');
         const userInfo = JSON.parse(userInfoString);
       
-        const offerResponse = await fetch(`${BASE}/Offer/GetUserOfferJob/${userInfo.id}/${item.id}`, {
+        const offerResponse = await fetch(`${Base1}/Offer/GetUserOfferJob/${userInfo.id}/${item.id}`, {
           method: 'GET',
           headers: {
             'Accept': '*/*',
+            Authorization: `Bearer ${token}`,
+
           },
         });
       
@@ -75,6 +88,8 @@ const DetailPage = ({ route }) => {
   };
   const handleOfferButton = async () => {
     try {
+      const token = await AsyncStorage.getItem('jwtToken');
+
       // Retrieve user information from AsyncStorage
       const userInfoString = await AsyncStorage.getItem('userInfo');
       const userInfo = JSON.parse(userInfoString);
@@ -85,7 +100,13 @@ const DetailPage = ({ route }) => {
         isActive: true,
         offerTime: new Date().toISOString(),
       };
-      const response = await axios.post(`${BASE}/Offer/AddOffer`, requestPayload);
+      const response = await axios.post(`${Base1}/Offer/AddOffer`, requestPayload, {
+        headers: {
+          'Accept': '*/*',
+          Authorization: `Bearer ${token}`,
+
+        },
+      });
           if (response.status === 200) {
             const messageData = {
               description: `Merhabalar hala boş musunuz?`,
@@ -97,12 +118,13 @@ const DetailPage = ({ route }) => {
         
             try {
               const response = await axios.post(
-                `${BASE}/Message/AddMessage`,
+                `${Base1}/Message/AddMessage`,
                 messageData,
                 {
                   headers: {
                     Accept: '*/*',
                     'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
                   },
                 }
               );         

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, Button, StyleSheet, Text, ScrollView } from "react-native";
 import { TextInput as PaperTextInput, Checkbox, Card, Title, Paragraph, Snackbar } from "react-native-paper";
-import { BASE } from '@env'; 
+import { Base1 } from '@env'; 
 import { useNavigation } from "@react-navigation/native";
 
 const RegisterPage = () => {
@@ -31,7 +31,7 @@ const RegisterPage = () => {
     };
   
     try {
-      const response = await fetch(`${BASE}/User/Create`, {
+      const response = await fetch(`${Base1}/User/Create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

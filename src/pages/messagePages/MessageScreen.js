@@ -12,7 +12,7 @@ import {
   Linking,
 } from 'react-native';
 import axios from 'axios';
-import { BASE } from '@env'; 
+import { Base1 } from '@env'; 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons'; // İcon kütüphanesi
 
@@ -26,6 +26,7 @@ const MessageScreen = ({ route }) => {
 
   const fetchUserInfo = async () => {
     try {
+      const token = await AsyncStorage.getItem('jwtToken');
       let info = null;
       if (Platform.OS === 'web') {
         info = JSON.parse(localStorage.getItem('userInfo'));
@@ -36,11 +37,13 @@ const MessageScreen = ({ route }) => {
       setsenderId(info?.id); // sadece ID'yi ayarlayın
   
       // Recipient bilgilerini almak için API isteği
-      const recipientResponse = await axios.get(`${BASE}/User/GetById/${recipientId}`,
+      const recipientResponse = await axios.get(`${Base1}/User/GetById/${recipientId}`,
         {
           headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+
           },
         });
   
@@ -63,10 +66,12 @@ const MessageScreen = ({ route }) => {
   const recipientId = item; 
 
   const fetchMessages = async () => {
+    const token = await AsyncStorage.getItem('jwtToken');
+
     try {
       if (!senderId) return; // senderId'nin tanımlı olduğundan emin olun
       const response = await axios.post(
-        `${BASE}/Message/GetByRepeitIdEndSenderIdMessage`,
+        `${Base1}/Message/GetByRepeitIdEndSenderIdMessage`,
         {
           senderId,
           recipientId,
@@ -75,6 +80,8 @@ const MessageScreen = ({ route }) => {
           headers: {
             Accept: '*/*',
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+
           },
         }
       );
@@ -98,12 +105,11 @@ const MessageScreen = ({ route }) => {
   useEffect(() => {
     // İlk yüklemede hemen fetchMessages çalıştırılır
     fetchMessages();
-
-    // Daha sonra her 5 saniyede bir çalıştırmak için interval ayarlanır
     const interval = setInterval(() => {
       fetchMessages();
-    }, 5000); // 5 saniyede bir tetiklenir
+    }, 5000); 
 
+    
     return () => clearInterval(interval); // Bileşen unmount olduğunda interval temizlenir
   }, [senderId, recipientId]);
   // Mesajları listeleme
@@ -133,13 +139,16 @@ const MessageScreen = ({ route }) => {
     };
 
     try {
+      const token = await AsyncStorage.getItem('jwtToken');
       const response = await axios.post(
-        `${BASE}/Message/AddMessage`,
+        `${Base1}/Message/AddMessage`,
         messageData,
         {
           headers: {
             Accept: '*/*',
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+
           },
         }
       );

@@ -3,7 +3,7 @@ import { View, StyleSheet, Text, Platform } from "react-native";
 import { TextInput, Button, Card, Title, Paragraph, Snackbar } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { BASE } from "@env";
+import { Base1 } from "@env";
 
 const Login = () => {
   const [userName, setUserName] = useState("osman63");
@@ -25,12 +25,13 @@ const Login = () => {
   };
 
   const handleLogin = async () => {
+    console.log(Base1);
     const loginData = {
       userName: userName,
       password: password,
     };
     try {
-      const response = await fetch(`${BASE}/User/Login`, {
+      const response = await fetch(`${Base1}/User/Login`, {
         method: "POST",
         headers: {
           Accept: "*/*",
@@ -46,7 +47,7 @@ const Login = () => {
           await saveData("jwtToken", token); // Token'ı sakla
 
           const userInfoResponse = await fetch(
-            `${BASE}/User/GetByUserName/${userName}`,
+            `${Base1}/User/GetByUserName/${userName}`,
             {
               method: "GET",
               headers: {
